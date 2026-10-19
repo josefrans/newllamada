@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Llamada con Vapi AI</title>
+  
+  <!-- Cargamos el SDK global oficial desde unpkg -->
+  <script src="https://unpkg.com/@vapi-ai/web@latest/dist/vapi.js"></script>
+
   <style>
     body {
       background-color: #0d2319;
@@ -44,21 +48,29 @@
   <button id="call-btn">START CALL 🎙️</button>
   <p id="status">Estado: Listo para conectar</p>
 
-  <!-- Importante: type="module" permite usar import en el navegador -->
-  <script type="module">
-    import Vapi from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/index.mjs';
-
+  <script>
     // Configura tus credenciales aquí:
     const PUBLIC_KEY = "18cf450c-7d12-4401-8b2a-c89e37e59025";       // Tu Public Key de Vapi
     const ASSISTANT_ID = "4b1a1ca4-a69a-49fb-8b48-5bce2711b29a";   // El ID de tu asistente
 
-    // Inicializamos Vapi
-    const vapi = new Vapi(PUBLIC_KEY);
+    // Inicializamos Vapi utilizando el objeto global window.Vapi
+    let vapi = null;
+    try {
+      vapi = window.Vapi ? new window.Vapi(PUBLIC_KEY) : null;
+    } catch (err) {
+      console.error("Error al instanciar Vapi:", err);
+    }
+
     const button = document.getElementById('call-btn');
     const statusText = document.getElementById('status');
     let callActive = false;
 
     button.addEventListener('click', async () => {
+      if (!vapi) {
+        alert("La librería de Vapi no se cargó correctamente.");
+        return;
+      }
+
       if (!callActive) {
         statusText.textContent = "Estado: Conectando...";
         try {
@@ -72,31 +84,32 @@
       }
     });
 
-    // Eventos del estado de la llamada
-    vapi.on('call-start', () => {
-      callActive = true;
-      button.textContent = "FINALIZAR LLAMADA 🛑";
-      button.style.backgroundColor = "#ff4d4d";
-      button.style.color = "#fff";
-      statusText.textContent = "Estado: Llamada en curso (Habla ahora)";
-    });
+    if (vapi) {
+      vapi.on('call-start', () => {
+        callActive = true;
+        button.textContent = "FINALIZAR LLAMADA 🛑";
+        button.style.backgroundColor = "#ff4d4d";
+        button.style.color = "#fff";
+        statusText.textContent = "Estado: Llamada en curso (Habla ahora)";
+      });
 
-    vapi.on('call-end', () => {
-      callActive = false;
-      button.textContent = "START CALL 🎙️";
-      button.style.backgroundColor = "#fff9ea";
-      button.style.color = "#000";
-      statusText.textContent = "Estado: Llamada finalizada";
-    });
+      vapi.on('call-end', () => {
+        callActive = false;
+        button.textContent = "START CALL 🎙️";
+        button.style.backgroundColor = "#fff9ea";
+        button.style.color = "#000";
+        statusText.textContent = "Estado: Llamada finalizada";
+      });
 
-    vapi.on('error', (e) => {
-      console.error("Error de Vapi:", e);
-      statusText.textContent = "Error en la llamada. Revisa F12.";
-      callActive = false;
-      button.textContent = "START CALL 🎙️";
-      button.style.backgroundColor = "#fff9ea";
-      button.style.color = "#000";
-    });
+      vapi.on('error', (e) => {
+        console.error("Error de Vapi:", e);
+        statusText.textContent = "Error en la llamada. Revisa F12.";
+        callActive = false;
+        button.textContent = "START CALL 🎙️";
+        button.style.backgroundColor = "#fff9ea";
+        button.style.color = "#000";
+      });
+    }
   </script>
 
 </body>
