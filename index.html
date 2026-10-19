@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Llamada con Vapi AI</title>
-  
+  <title>Asistente de Voz Vapi</title>
   <style>
     body {
       background-color: #0d2319;
@@ -17,71 +16,58 @@
       height: 100vh;
       margin: 0;
     }
-    #call-btn {
-      background-color: #fff9ea;
-      color: #000;
-      border: none;
-      padding: 18px 36px;
-      font-size: 18px;
-      font-weight: bold;
+    h2 {
+      margin-bottom: 20px;
+      font-weight: normal;
+    }
+    .vapi-container {
+      background: #fff9ea;
+      padding: 10px 25px;
       border-radius: 40px;
-      cursor: pointer;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      transition: 0.2s;
-    }
-    #call-btn:hover {
-      background-color: #ffffff;
-      transform: scale(1.05);
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #a0aec0;
     }
   </style>
 </head>
 <body>
 
-  <!-- Botón nativo de Vapi que inyecta la interfaz oficial automáticamente -->
-  <button id="call-btn">START CALL 🎙️</button>
-  <p id="status">Estado: Listo</p>
+  <h2>Habla con nuestro asistente virtual</h2>
 
-  <!-- Script oficial del SDK web de Vapi -->
-  <script>
-    var publicKey = "18cf450c-7d12-4401-8b2a-c89e37e59025"; // Reemplaza por tu Public Key
-    var assistantId = "4b1a1ca4-a69a-49fb-8b48-5bce2711b29a"; // Reemplaza por el ID de tu asistente
+  <div class="vapi-container">
+    <!-- Script oficial incrustado de Vapi -->
+    <script>
+      var publicKey = "18cf450c-7d12-4401-8b2a-c89e37e59025";     // Reemplaza con tu Public Key
+      var assistantId = "4b1a1ca4-a69a-49fb-8b48-5bce2711b29a"; // Reemplaza con el ID de tu Asistente
 
-    // Carga dinámica del script oficial del widget de Vapi
-    (function (d, t) {
-      var g = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-      g.defer = true;
-      g.async = true;
-      s.parentNode.insertBefore(g, s);
+      (function (d, t) {
+        var g = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
 
-      g.onload = function () {
-        window.vapiSDK.run({
-          apiKey: publicKey,
-          assistant: assistantId,
-          config: {
-            // Personalización visual opcional del botón flotante si se desea
-            position: "bottom-right",
-            offset: "40px",
-            width: "50px",
-            height: "50px",
-            idle: {
-              color: rgb(255, 249, 234),
-              type: "pill",
-              title: "START CALL",
-              subtitle: "",
-              icon: "https://unpkg.com/lucide-static@latest/icons/phone.svg",
-            },
-          },
-        });
-      };
-    })(document, "script");
-  </script>
+        g.onload = function () {
+          window.vapiSDK.run({
+            apiKey: publicKey,
+            assistant: assistantId,
+            config: {
+              position: "bottom-right",
+              offset: "30px",
+              width: "50px",
+              height: "50px",
+              idle: {
+                color: "rgb(13, 35, 25)", // <-- Corregido con comillas
+                type: "pill",
+                title: "START CALL",
+                subtitle: "",
+                icon: "https://unpkg.com/lucide-static@latest/icons/phone.svg",
+              }
+            }
+          });
+        };
+      })(document, "script");
+    </script>
+  </div>
 
 </body>
 </html>
