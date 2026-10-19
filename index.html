@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Llamada con Vapi AI</title>
   
-  <!-- Cargamos el SDK global oficial desde unpkg -->
-  <script src="https://unpkg.com/@vapi-ai/web@latest/dist/vapi.js"></script>
-
   <style>
     body {
       background-color: #0d2319;
@@ -20,7 +17,7 @@
       height: 100vh;
       margin: 0;
     }
-    button {
+    #call-btn {
       background-color: #fff9ea;
       color: #000;
       border: none;
@@ -32,7 +29,7 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       transition: 0.2s;
     }
-    button:hover {
+    #call-btn:hover {
       background-color: #ffffff;
       transform: scale(1.05);
     }
@@ -45,71 +42,45 @@
 </head>
 <body>
 
+  <!-- Botón nativo de Vapi que inyecta la interfaz oficial automáticamente -->
   <button id="call-btn">START CALL 🎙️</button>
-  <p id="status">Estado: Listo para conectar</p>
+  <p id="status">Estado: Listo</p>
 
+  <!-- Script oficial del SDK web de Vapi -->
   <script>
-    // Configura tus credenciales aquí:
-    const PUBLIC_KEY = "18cf450c-7d12-4401-8b2a-c89e37e59025";       // Tu Public Key de Vapi
-    const ASSISTANT_ID = "4b1a1ca4-a69a-49fb-8b48-5bce2711b29a";   // El ID de tu asistente
+    var publicKey = "18cf450c-7d12-4401-8b2a-c89e37e59025"; // Reemplaza por tu Public Key
+    var assistantId = "4b1a1ca4-a69a-49fb-8b48-5bce2711b29a"; // Reemplaza por el ID de tu asistente
 
-    // Inicializamos Vapi utilizando el objeto global window.Vapi
-    let vapi = null;
-    try {
-      vapi = window.Vapi ? new window.Vapi(PUBLIC_KEY) : null;
-    } catch (err) {
-      console.error("Error al instanciar Vapi:", err);
-    }
+    // Carga dinámica del script oficial del widget de Vapi
+    (function (d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g, s);
 
-    const button = document.getElementById('call-btn');
-    const statusText = document.getElementById('status');
-    let callActive = false;
-
-    button.addEventListener('click', async () => {
-      if (!vapi) {
-        alert("La librería de Vapi no se cargó correctamente.");
-        return;
-      }
-
-      if (!callActive) {
-        statusText.textContent = "Estado: Conectando...";
-        try {
-          await vapi.start(ASSISTANT_ID);
-        } catch (err) {
-          console.error("Error al iniciar la llamada:", err);
-          statusText.textContent = "Error al conectar. Revisa la consola (F12).";
-        }
-      } else {
-        vapi.stop();
-      }
-    });
-
-    if (vapi) {
-      vapi.on('call-start', () => {
-        callActive = true;
-        button.textContent = "FINALIZAR LLAMADA 🛑";
-        button.style.backgroundColor = "#ff4d4d";
-        button.style.color = "#fff";
-        statusText.textContent = "Estado: Llamada en curso (Habla ahora)";
-      });
-
-      vapi.on('call-end', () => {
-        callActive = false;
-        button.textContent = "START CALL 🎙️";
-        button.style.backgroundColor = "#fff9ea";
-        button.style.color = "#000";
-        statusText.textContent = "Estado: Llamada finalizada";
-      });
-
-      vapi.on('error', (e) => {
-        console.error("Error de Vapi:", e);
-        statusText.textContent = "Error en la llamada. Revisa F12.";
-        callActive = false;
-        button.textContent = "START CALL 🎙️";
-        button.style.backgroundColor = "#fff9ea";
-        button.style.color = "#000";
-      });
-    }
+      g.onload = function () {
+        window.vapiSDK.run({
+          apiKey: publicKey,
+          assistant: assistantId,
+          config: {
+            // Personalización visual opcional del botón flotante si se desea
+            position: "bottom-right",
+            offset: "40px",
+            width: "50px",
+            height: "50px",
+            idle: {
+              color: rgb(255, 249, 234),
+              type: "pill",
+              title: "START CALL",
+              subtitle: "",
+              icon: "https://unpkg.com/lucide-static@latest/icons/phone.svg",
+            },
+          },
+        });
+      };
+    })(document, "script");
   </script>
 
 </body>
