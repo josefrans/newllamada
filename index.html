@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Llamada Vapi</title>
+  <!-- Carga del SDK oficial -->
+  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+  <style>
+    body {
+      background-color: #0d2319;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      background-color: #fff9ea;
+      color: #000;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="call-btn">START CALL 🎙️</button>
+  <p id="status">Estado: Listo</p>
+
+  <script>
+    // Configura aquí tus claves públicas
+    const PUBLIC_KEY = "COLOCA_AQUI_TU_PUBLIC_KEY";
+    const ASSISTANT_ID = "COLOCA_AQUI_TU_ASSISTANT_ID";
+
+    const button = document.getElementById('call-btn');
+    const statusText = document.getElementById('status');
+    
+    // Inicialización
+    const vapi = new Vapi.default(PUBLIC_KEY);
+    let activeCall = false;
+
+    button.addEventListener('click', async () => {
+      if (!activeCall) {
+        statusText.textContent = "Estado: Conectando...";
+        try {
+          await vapi.start(ASSISTANT_ID);
+        } catch (err) {
+          console.error("Error al iniciar:", err);
+          statusText.textContent = "Error: Verifica la consola (F12)";
+        }
+      } else {
+        vapi.stop();
+      }
+    });
+
+    vapi.on('call-start', () => {
+      activeCall = true;
+      button.textContent = "FINALIZAR LLAMADA 🛑";
+      statusText.textContent = "Estado: Llamada en curso";
+    });
+
+    vapi.on('call-end', () => {
+      activeCall = false;
+      button.textContent = "START CALL 🎙️";
+      statusText.textContent = "Estado: Finalizada";
+    });
+
+    vapi.on('error', (e) => {
+      console.error("Error devuelto por Vapi:", e);
+      statusText.textContent = "Error en la llamada. Revisa F12.";
+      activeCall = false;
+    });
+  </script>
+</body>
+</html>
